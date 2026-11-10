@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101b35">
+<title>StudyManager — Espace étudiant</title>
+<style>
+:root{
+  --bg:#f4f6fb;--surface:#fff;--ink:#17233d;--muted:#78839a;
+  --navy:#101b35;--blue:#526df5;--blue2:#7187ff;--line:#e8ecf4;
+  --green:#159b72;--red:#d84d61;--amber:#d99a28;--shadow:0 12px 34px rgba(22,35,65,.07);
+  --radius:20px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:1120px;margin:auto;min-height:100vh;padding-bottom:92px}
+.topbar{background:linear-gradient(135deg,#101b35,#243b70);color:white;padding:25px 20px 28px;border-radius:0 0 28px 28px}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.4px}
+.brand span{color:#9eafff}
+.date{font-size:12px;color:#c5cde2;margin-top:5px}
+.avatar{width:42px;height:42px;border-radius:15px;background:#ffffff20;display:grid;place-items:center;font-weight:800}
+.welcome{margin-top:27px}
+.welcome small{color:#c4cde5}
+.welcome h1{font-size:27px;line-height:1.15;margin:6px 0 8px;letter-spacing:-.8px}
+.welcome p{color:#c4cde5;font-size:13px;margin:0}
+main{padding:18px 16px 30px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:-1px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:14px 12px;box-shadow:var(--shadow)}
+.stat .num{font-size:22px;font-weight:800;letter-spacing:-.7px}
+.stat .label{font-size:11px;color:var(--muted);margin-top:4px}
+.section{display:none}
+.section.active{display:block}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:24px 2px 13px}
+.sectionhead h2{font-size:18px;margin:0;letter-spacing:-.4px}
+.muted{color:var(--muted);font-size:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:17px;margin-bottom:13px;box-shadow:var(--shadow)}
+.card h3{font-size:14px;margin:0 0 12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{margin-bottom:10px}
+label{display:block;font-size:11px;font-weight:700;color:#68748b;margin:0 0 6px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:#fbfcff;color:var(--ink);border-radius:12px;padding:12px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #526df51c}
+textarea{min-height:100px;resize:vertical}
+.btn{border:0;border-radius:12px;padding:12px 15px;background:var(--blue);color:#fff;font-weight:700;font-size:13px}
+.btn:active{transform:scale(.98)}
+.btn.secondary{background:#eef1ff;color:#4058d8}
+.btn.ghost{background:#f3f5fa;color:#4b5870}
+.btn.danger{background:#fff0f2;color:var(--red)}
+.btn.small{padding:8px 10px;font-size:11px}
+.btn.full{width:100%}
+.row{display:flex;align-items:center;gap:8px}
+.between{justify-content:space-between}
+.item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0;padding-bottom:0}
+.item:first-child{padding-top:0}
+.itemtitle{font-size:13px;font-weight:750}
+.itemsub{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
+.pill{display:inline-flex;align-items:center;border-radius:30px;padding:5px 9px;font-size:10px;font-weight:750;background:#eef1ff;color:#4d62d9;white-space:nowrap}
+.pill.green{background:#e7f8f1;color:#13845f}
+.pill.amber{background:#fff5df;color:#a97416}
+.pill.red{background:#fff0f2;color:#c23f55}
+.empty{text-align:center;color:var(--muted);font-size:12px;padding:22px 8px}
+.progress{height:8px;background:#edf0f6;border-radius:20px;overflow:hidden;margin-top:9px}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),#8b9cff);border-radius:20px}
+.nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#ffffffed;backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
+.navinner{width:min(700px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+.nav button{border:0;background:transparent;color:#8993a8;padding:7px 2px;border-radius:12px;font-size:10px;font-weight:650}
+.nav button b{display:block;font-size:19px;margin-bottom:3px;font-weight:500}
+.nav button.active{color:var(--blue);background:#f0f2ff}
+.taskcheck{width:19px;height:19px;accent-color:var(--blue);margin-top:2px}
+.notecontent{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;color:#58647a;margin-top:7px}
+.pdfname{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+dialog{border:0;border-radius:22px;padding:20px;width:min(480px,calc(100% - 28px));box-shadow:0 24px 90px #101b3560}
+dialog::backdrop{background:#101b3577;backdrop-filter:blur(3px)}
+.dialoghead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.dialoghead h3{margin:0}
+.toast{position:fixed;z-index:30;bottom:92px;left:50%;transform:translateX(-50%);background:#17233d;color:#fff;padding:11px 16px;border-radius:12px;font-size:12px;box-shadow:var(--shadow);display:none;max-width:90%;text-align:center}
+@media(min-width:760px){
+ .topbar{border-radius:0 0 32px 32px;padding:28px 36px 34px}
+ main{padding:24px 36px 40px}
+ .app{padding-bottom:35px}
+ .nav{position:sticky;bottom:0;border:1px solid var(--line);border-radius:18px;margin:0 auto 15px;width:min(700px,calc(100% - 30px))}
+ .stats{max-width:650px}
+ .section.active{max-width:850px}
+ .toast{bottom:30px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+ <div class="toprow"><div><div class="brand">Study<span>Manager</span></div><div class="date" id="today"></div></div><div class="avatar">SM</div></div>
+ <div class="welcome"><small>TON ESPACE ÉTUDIANT</small><h1>Travaille mieux.<br>Progresse chaque jour.</h1><p>Tout ton parcours académique, au même endroit.</p></div>
+</header>
+<main>
+ <div class="stats">
+  <div class="stat"><div class="num" id="statTasks">0</div><div class="label">Devoirs à faire</div></div>
+  <div class="stat"><div class="num" id="statCourses">0</div><div class="label">Cours planifiés</div></div>
+  <div class="stat"><div class="num" id="statAverage">—</div><div class="label">Moyenne générale</div></div>
+ </div>
+
+ <section class="section active" id="home">
+  <div class="sectionhead"><h2>Vue d'ensemble</h2><span class="muted">Ton tableau de bord</span></div>
+  <div class="card">
+   <div class="row between"><h3>Ta progression</h3><span class="pill green" id="progressLabel">0 % terminé</span></div>
+   <div class="progress"><span id="progressBar" style="width:0%"></span></div>
+   <p class="muted" id="progressText">Ajoute tes devoirs pour suivre ta progression.</p>
+  </div>
+  <div class="card"><div class="row between"><h3>Prochains cours</h3><button class="btn small secondary" onclick="showTab('schedule')">Voir tout</button></div><div id="homeSchedule" class="empty">Aucun cours planifié.</div></div>
+  <div class="card"><div class="row between"><h3>À faire en priorité</h3><button class="btn small secondary" onclick="showTab('tasks')">Voir tout</button></div><div id="homeTasks" class="empty">Aucun devoir en attente.</div></div>
+  <div class="card"><div class="row between"><h3>Rappels</h3><button class="btn small secondary" onclick="showTab('reminders')">Gérer</button></div><div id="homeReminders" class="empty">Aucun rappel programmé.</div></div>
+ </section>
+
+ <section class="section" id="schedule">
+  <div class="sectionhead"><h2>Emploi du temps</h2><button class="btn small" onclick="openDialog('courseDialog')">＋ Ajouter</button></div>
+  <div class="card"><p class="muted">Organise tes cours par jour et par heure.</p><div id="scheduleList" class="empty">Ton emploi du temps est vide.</div></div>
+ </section>
+
+ <section class="section" id="tasks">
+  <div class="sectionhead"><h2>Mes devoirs</h2><button class="btn small" onclick="openDialog('taskDialog')">＋ Ajouter</button></div>
+  <div class="card"><div class="row between"><span class="muted">Toutes tes tâches</span><select id="taskFilter" style="width:auto;padding:8px" onchange="renderTasks()"><option value="all">Toutes</option><option value="todo">À faire</option><option value="done">Terminées</option></select></div><div id="taskList" class="empty">Aucun devoir enregistré.</div></div>
+ </section>
+
+ <section class="section" id="grades">
+  <div class="sectionhead"><h2>Notes & moyennes</h2><button class="btn small" onclick="openDialog('gradeDialog')">＋ Ajouter</button></div>
+  <div class="card"><div class="row between"><div><div class="muted">Moyenne générale</div><div style="font-size:32px;font-weight:850" id="bigAverage">—</div></div><span class="pill" id="gradeCount">0 note</span></div><p class="muted">Calcul pondéré selon les coefficients saisis.</p></div>
+  <div class="card"><h3>Résultats par matière</h3><div id="gradeList" class="empty">Ajoute tes premières notes.</div></div>
+ </section>
+
+ <section class="section" id="pdfs">
+  <div class="sectionhead"><h2>Mes cours en PDF</h2><button class="btn small" onclick="document.getElementById('pdfInput').click()">＋ Importer</button></div>
+  <div class="card"><p class="muted">Importe tes supports de cours PDF pour les retrouver facilement sur cet appareil.</p><input type="file" id="pdfInput" accept="application/pdf,.pdf" hidden onchange="addPDF(this.files[0])"><div id="pdfList" class="empty">Aucun document importé.</div></div>
+  <p class="muted">Les PDF sont enregistrés dans le stockage local de ton navigateur. Évite d'effacer les données du navigateur et conserve une copie de tes documents importants.</p>
+ </section>
+
+ <section class="section" id="reminders">
+  <div class="sectionhead"><h2>Mes rappels</h2><button class="btn small" onclick="openDialog('reminderDialog')">＋ Ajouter</button></div>
+  <div class="card"><p class="muted">Programme une alerte pour une révision, un devoir ou un examen. Les notifications nécessitent l'autorisation du navigateur et l'application doit rester ouverte.</p><button class="btn secondary full" onclick="enableNotifications()">Activer les notifications</button><div id="reminderList" style="margin-top:14px" class="empty">Aucun rappel programmé.</div></div>
+ </section>
+</main>
+
+<nav class="nav"><div class="navinner">
+ <button class="active" data-tab="home" onclick="showTab('home')"><b>⌂</b>Accueil</button>
+ <button data-tab="schedule" onclick="showTab('schedule')"><b>▦</b>Planning</button>
+ <button data-tab="tasks" onclick="showTab('tasks')"><b>✓</b>Devoirs</button>
+ <button data-tab="grades" onclick="showTab('grades')"><b>◈</b>Notes</button>
+ <button data-tab="pdfs" onclick="showTab('pdfs')"><b>▤</b>Cours PDF</button>
+</div></nav>
+</div>
+
+<dialog id="courseDialog"><div class="dialoghead"><h3>Ajouter un cours</h3><button class="btn ghost small" onclick="closeDialog('courseDialog')">✕</button></div>
+ <form id="courseForm"><div class="field"><label>Nom du cours</label><input name="name" required placeholder="Ex. Introduction au droit"></div>
+ <div class="grid2"><div class="field"><label>Jour</label><select name="day"><option>Lundi</option><option>Mardi</option><option>Mercredi</option><option>Jeudi</option><option>Vendredi</option><option>Samedi</option><option>Dimanche</option></select></div><div class="field"><label>Heure</label><input name="time" type="time" required></div></div>
+ <div class="field"><label>Salle (facultatif)</label><input name="room" placeholder="Ex. Amphi A"></div><button class="btn full">Enregistrer le cours</button></form></dialog>
+
+<dialog id="taskDialog"><div class="dialoghead"><h3>Ajouter un devoir</h3><button class="btn ghost small" onclick="closeDialog('taskDialog')">✕</button></div>
+ <form id="taskForm"><div class="field"><label>Titre du devoir</label><input name="title" required placeholder="Ex. Dissertation de philosophie"></div><div class="grid2"><div class="field"><label>Matière</label><input name="subject" placeholder="Philosophie"></div><div class="field"><label>Date limite</label><input name="date" type="date"></div></div><button class="btn full">Ajouter à ma liste</button></form></dialog>
+
+<dialog id="gradeDialog"><div class="dialoghead"><h3>Ajouter une note</h3><button class="btn ghost small" onclick="closeDialog('gradeDialog')">✕</button></div>
+ <form id="gradeForm"><div class="field"><label>Matière</label><input name="subject" required placeholder="Ex. Économie"></div><div class="grid2"><div class="field"><label>Note sur 20</label><input name="score" type="number" min="0" max="20" step=".25" required placeholder="14"></div><div class="field"><label>Coefficient</label><input name="coef" type="number" min=".1" step=".1" value="1" required></div></div><button class="btn full">Enregistrer la note</button></form></dialog>
+
+<dialog id="reminderDialog"><div class="dialoghead"><h3>Créer un rappel</h3><button class="btn ghost small" onclick="closeDialog('reminderDialog')">✕</button></div>
+ <form id="reminderForm"><div class="field"><label>Objet du rappel</label><input name="title" required placeholder="Ex. Réviser le chapitre 2"></div><div class="field"><label>Date et heure</label><input name="when" type="datetime-local" required></div><button class="btn full">Programmer le rappel</button></form></dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+const DB_NAME='StudyManagerDB', STORE='pdfs';
+let db;
+let data={courses:[],tasks:[],grades:[],reminders:[]};
+const dayOrder=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const $=id=>document.getElementById(id);
+const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display='none',2800)}
+function save(){localStorage.setItem('studyManagerData',JSON.stringify(data));renderAll()}
+function load(){try{data={...data,...JSON.parse(localStorage.getItem('studyManagerData')||'{}')}}catch(e){}}
+function showTab(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id==='reminders')renderReminders();window.scrollTo({top:0,behavior:'smooth'})}
+function openDialog(id){$(id).showModal()}
+function closeDialog(id){$(id).close()}
+function dateFR(v){if(!v)return 'Sans date';const d=new Date(v+'T00:00:00');return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})}
+function renderAll(){renderStats();renderSchedule();renderTasks();renderGrades();renderReminders();renderHome()}
+function renderStats(){ $('statTasks').textContent=data.tasks.filter(t=>!t.done).length;$('statCourses').textContent=data.courses.length;$('statAverage').textContent=average()===null?'—':average().toFixed(2) }
+function renderHome(){
+ const total=data.tasks.length,done=data.tasks.filter(t=>t.done).length,pct=total?Math.round(done/total*100):0;
+ $('progressLabel').textContent=pct+' % terminé';$('progressBar').style.width=pct+'%';$('progressText').textContent=total?`${done} devoir(s) terminé(s) sur ${total}.`:'Ajoute tes devoirs pour suivre ta progression.';
+ const courses=[...data.courses].sort((a,b)=>dayOrder.indexOf(a.day)-dayOrder.indexOf(b.day)||a.time.localeCompare(b.time)).slice(0,3);
+ $('homeSchedule').innerHTML=courses.length?courses.map(c=>`<div class="item"><div><div class="itemtitle">${safe(c.name)}</div><div class="itemsub">${safe(c.day)} · ${safe(c.time)}${c.room?' · '+safe(c.room):''}</div></div></div>`).join(''):'<div class="empty">Aucun cours planifié.</div>';
+ const tasks=data.tasks.filter(t=>!t.done).sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999')).slice(0,3);
+ $('homeTasks').innerHTML=tasks.length?tasks.map(t=>`<div class="item"><div><div class="itemtitle">${safe(t.title)}</div><div class="itemsub">${safe(t.subject||'Sans matière')} · ${dateFR(t.date)}</div></div><span class="pill amber">À faire</span></div>`).join(''):'<div class="empty">Aucun devoir en attente.</div>';
+ const upcoming=data.reminders.filter(r=>!r.fired&&new Date(r.when)>new Date()).sort((a,b)=>new Date(a.when)-new Date(b.when)).slice(0,2);
+ $('homeReminders').innerHTML=upcoming.length?upcoming.map(r=>`<div class="item"><div><div class="itemtitle">${safe(r.title)}</div><div class="itemsub">${new Date(r.when).toLocaleString('fr-FR')}</div></div></div>`).join(''):'<div class="empty">Aucun rappel programmé.</div>';
+}
+function renderSchedule(){
+ const list=[...data.courses].sort((a,b)=>dayOrder.indexOf(a.day)-dayOrder.indexOf(b.day)||a.time.localeCompare(b.time));
+ $('scheduleList').innerHTML=list.length?list.map(c=>`<div class="item"><div><div class="itemtitle">${safe(c.name)}</div><div class="itemsub">${safe(c.day)} · ${safe(c.time)}${c.room?' · '+safe(c.room):''}</div></div><button class="btn danger small" onclick="removeEntry('courses','${c.id}')">Supprimer</button></div>`).join(''):'<div class="empty">Ton emploi du temps est vide.</div>';
+}
+function renderTasks(){
+ const filter=$('taskFilter').value;let list=[...data.tasks].filter(t=>filter==='all'||(filter==='done'?t.done:!t.done)).sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+ $('taskList').innerHTML=list.length?list.map(t=>`<div class="item"><div class="row" style="align-items:flex-start;flex:1"><input class="taskcheck" type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${t.id}',this.checked)"><div><div class="itemtitle" style="${t.done?'text-decoration:line-through;opacity:.55':''}">${safe(t.title)}</div><div class="itemsub">${safe(t.subject||'Sans matière')} · Échéance : ${dateFR(t.date)}</div></div></div><button class="btn danger small" onclick="removeEntry('tasks','${t.id}')">✕</button></div>`).join(''):'<div class="empty">Aucun devoir dans cette catégorie.</div>';
+}
+function average(){if(!data.grades.length)return null;let total=0,coef=0;data.grades.forEach(g=>{total+=Number(g.score)*Number(g.coef);coef+=Number(g.coef)});return coef?total/coef:null}
+function renderGrades(){
+ const avg=average();$('bigAverage').textContent=avg===null?'—':avg.toFixed(2)+'/20';$('gradeCount').textContent=data.grades.length+' note(s)';
+ const groups={};data.grades.forEach(g=>(groups[g.subject]??=[]).push(g));
+ const names=Object.keys(groups);
+ $('gradeList').innerHTML=names.length?names.map(name=>{let arr=groups[name],sum=arr.reduce((s,g)=>s+g.score*g.coef,0),co=arr.reduce((s,g)=>s+g.coef,0),m=sum/co;return `<div class="item"><div style="flex:1"><div class="itemtitle">${safe(name)}</div><div class="itemsub">${arr.length} note(s) · ${arr.map(g=>safe(g.score+'/20 (coef. '+g.coef+')')).join(' · ')}</div><div class="progress"><span style="width:${Math.max(0,Math.min(100,m/20*100))}%"></span></div></div><div style="text-align:right"><b>${m.toFixed(2)}/20</b><div><button class="btn danger small" onclick="deleteGrades('${encodeURIComponent(name)}')">Retirer</button></div></div></div>`}).join(''):'<div class="empty">Ajoute tes premières notes.</div>';
+}
+function renderReminders(){
+ const list=[...data.reminders].sort((a,b)=>new Date(a.when)-new Date(b.when));
+ $('reminderList').innerHTML=list.length?list.map(r=>`<div class="item"><div><div class="itemtitle">${safe(r.title)}</div><div class="itemsub">${new Date(r.when).toLocaleString('fr-FR')}</div><span class="pill ${r.fired?'green':'amber'}">${r.fired?'Envoyé':'Programmé'}</span></div><button class="btn danger small" onclick="removeEntry('reminders','${r.id}')">Supprimer</button></div>`).join(''):'<div class="empty">Aucun rappel programmé.</div>';
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function removeEntry(type,id){data[type]=data[type].filter(x=>x.id!==id);save();toast('Élément supprimé.')}
+function toggleTask(id,done){let t=data.tasks.find(x=>x.id===id);if(t)t.done=done;save()}
+function deleteGrades(subject){let s=decodeURIComponent(subject);data.grades=data.grades.filter(g=>g.subject!==s);save()}
+$('courseForm').addEventListener('submit',e=>{e.preventDefault();let f=new FormData(e.target);data.courses.push({id:uid(),name:f.get('name').trim(),day:f.get('day'),time:f.get('time'),room:f.get('room').trim()});e.target.reset();closeDialog('courseDialog');save();toast('Cours ajouté.')});
+$('taskForm').addEventListener('submit',e=>{e.preventDefault();let f=new FormData(e.target);data.tasks.push({id:uid(),title:f.get('title').trim(),subject:f.get('subject').trim(),date:f.get('date'),done:false});e.target.reset();closeDialog('taskDialog');save();toast('Devoir ajouté.')});
+$('gradeForm').addEventListener('submit',e=>{e.preventDefault();let f=new FormData(e.target);data.grades.push({id:uid(),subject:f.get('subject').trim(),score:Number(f.get('score')),coef:Number(f.get('coef'))});e.target.reset();closeDialog('gradeDialog');save();toast('Note enregistrée.')});
+$('reminderForm').addEventListener('submit',e=>{e.preventDefault();let f=new FormData(e.target),when=f.get('when');if(new Date(when)<=new Date()){toast('Choisis une date future.');return}data.reminders.push({id:uid(),title:f.get('title').trim(),when,fired:false});e.target.reset();closeDialog('reminderDialog');save();toast('Rappel programmé.');checkReminders()});
+
+function enableNotifications(){if(!('Notification'in window)){toast('Notifications non prises en charge par ce navigateur.');return}Notification.requestPermission().then(p=>toast(p==='granted'?'Notifications activées.':"Autorisation refusée par le navigateur."))}
+function checkReminders(){
+ const now=Date.now();let changed=false;
+ data.reminders.forEach(r=>{if(!r.fired&&new Date(r.when).getTime()<=now){r.fired=true;changed=true;if('Notification'in window&&Notification.permission==='granted'){try{new Notification('StudyManager',{body:r.title})}catch(e){toast('Rappel : '+r.title)}}else toast('Rappel : '+r.title)}});
+ if(changed){localStorage.setItem('studyManagerData',JSON.stringify(data));renderAll()}
+}
+setInterval(checkReminders,15000);
+
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>req.result.createObjectStore(STORE,{keyPath:'id'});req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)})}
+function dbRequest(mode,fn){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,mode),store=tx.objectStore(STORE),req=fn(store);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+async function addPDF(file){if(!file)return;if(file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf')){toast('Choisis un fichier PDF.');return}try{await dbRequest('readwrite',s=>s.put({id:uid(),name:file.name,size:file.size,blob:file,added:new Date().toISOString()}));renderPDFs();toast('PDF importé.')}catch(e){toast("Impossible d'enregistrer ce PDF. Espace de stockage insuffisant ?")} $('pdfInput').value=''}
+async function renderPDFs(){if(!db)return;try{const docs=await dbRequest('readonly',s=>s.getAll());$('pdfList').innerHTML=docs.length?docs.map(d=>`<div class="item"><div style="flex:1"><div class="pdfname">📄 ${safe(d.name)}</div><div class="itemsub">${(d.size/1024/1024).toFixed(2)} Mo · ajouté le ${new Date(d.added).toLocaleDateString('fr-FR')}</div><button class="btn secondary small" onclick="openPDF('${d.id}')">Ouvrir le PDF</button></div><button class="btn danger small" onclick="deletePDF('${d.id}')">Supprimer</button></div>`).join(''):'<div class="empty">Aucun document importé.</div>'}catch(e){$('pdfList').textContent='Erreur de lecture des documents.'}}
+async function openPDF(id){const d=await dbRequest('readonly',s=>s.get(id));if(!d)return;const url=URL.createObjectURL(d.blob);const w=window.open(url,'_blank');if(!w)toast('Autorise les fenêtres contextuelles pour ouvrir le PDF.');setTimeout(()=>URL.revokeObjectURL(url),60000)}
+async function deletePDF(id){if(!confirm('Supprimer ce PDF de StudyManager ?'))return;await dbRequest('readwrite',s=>s.delete(id));renderPDFs();toast('PDF supprimé.')}
+function initDate(){$('today').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+async function init(){initDate();load();renderAll();try{await openDB();await renderPDFs()}catch(e){$('pdfList').textContent='Le stockage des PDF n’est pas disponible dans ce navigateur.'}}
+init();
+</script>
+</body>
+</html>
